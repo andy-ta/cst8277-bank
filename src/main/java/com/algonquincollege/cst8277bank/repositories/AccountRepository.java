@@ -1,9 +1,9 @@
-package repositories;
+package com.algonquincollege.cst8277bank.repositories;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import models.Account;
+import com.algonquincollege.cst8277bank.models.Account;
 import org.springframework.stereotype.Component;
 
 @Component

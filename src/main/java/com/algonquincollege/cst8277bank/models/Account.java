@@ -1,4 +1,4 @@
-package models;
+package com.algonquincollege.cst8277bank.models;
 
 import java.util.List;
 

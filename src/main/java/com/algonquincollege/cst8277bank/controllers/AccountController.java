@@ -1,6 +1,6 @@
-package controllers;
+package com.algonquincollege.cst8277bank.controllers;
 
-import models.Account;
+import com.algonquincollege.cst8277bank.models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import services.AccountService;
+import com.algonquincollege.cst8277bank.services.AccountService;
 
 @RestController
 public class AccountController {

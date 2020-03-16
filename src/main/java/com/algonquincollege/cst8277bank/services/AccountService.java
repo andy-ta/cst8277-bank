@@ -1,9 +1,9 @@
-package services;
+package com.algonquincollege.cst8277bank.services;
 
-import models.Account;
+import com.algonquincollege.cst8277bank.models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repositories.AccountRepository;
+import com.algonquincollege.cst8277bank.repositories.AccountRepository;
 
 import java.util.Map;
 
