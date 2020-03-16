@@ -1,5 +1,6 @@
 package com.algonquincollege.cst8277bank.services;
 
+import com.algonquincollege.cst8277bank.exceptions.ClientException;
 import com.algonquincollege.cst8277bank.models.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AccountService {
 			Long id = (long) (accounts.size() + 1);
 			account.setId(id);
 			if (account.getBalance() > 0) {
-				throw new Exception("Error: Cannot create account with balance greater than zero");
+				throw new ClientException("Cannot create account with balance greater than zero");
 			}
 			accounts.put(id, account);
 		} else {
@@ -31,7 +32,7 @@ public class AccountService {
 				accounts.put(account.getId(), account);
 
 			} else {
-				throw new Exception("Error: Cannot modify your own balance.");
+				throw new ClientException("Cannot modify your own balance.");
 			}
 		}
 
@@ -52,7 +53,7 @@ public class AccountService {
 			account.setBalance(account.getBalance() + amount);
 			
 		} else {
-			throw new Exception("Error: amount must be greater then zero.");
+			throw new ClientException("Amount must be greater then zero.");
 		}
 
 		return save(account);
@@ -61,10 +62,10 @@ public class AccountService {
 	public Account withdraw(Long id, double amount) throws Exception {
 		Account account = accountRepository.getAccounts().get(id);
 
-		if(amount > 0 && account.getBalance() > amount) {
+		if (amount > 0 && account.getBalance() > amount) {
 			account.setBalance(account.getBalance() - amount);
-		}else {
-			throw new Exception("Error: not enough money in account to withdraw.");
+		} else {
+			throw new ClientException("Not enough money in account to withdraw.");
 		}
 		
 		return save(account);

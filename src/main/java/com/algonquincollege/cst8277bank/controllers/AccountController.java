@@ -1,19 +1,20 @@
 package com.algonquincollege.cst8277bank.controllers;
 
+import com.algonquincollege.cst8277bank.exceptions.ClientException;
 import com.algonquincollege.cst8277bank.models.Account;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import com.algonquincollege.cst8277bank.services.AccountService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/v1")
 public class AccountController {
 
 	private AccountService accountService;
@@ -23,42 +24,74 @@ public class AccountController {
 		this.accountService = accountService;
 	}
 
+	@ApiOperation(value = "Create an account", response = Account.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "Successfully created account"),
+			@ApiResponse(code = 400, message = "Invalid input")
+	})
 	@PostMapping("/accounts")
-	public Account saveAccount(@RequestBody Account account) throws Exception {
-		return accountService.save(account);
+	public ResponseEntity<Account> saveAccount(@RequestBody Account account) throws Exception {
+		Account result = accountService.save(account);
+		return ResponseEntity.created(new URI("/api/v1/accounts/" + result.getId())).body(result);
 	}
 
+	@ApiOperation(value = "Find an account", response = Account.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully created account"),
+			@ApiResponse(code = 404, message = "Account not found")
+	})
 	@GetMapping("/accounts/{id}")
-	public Account findAccount(@PathVariable Long id) {
-		return accountService.find(id);
+	public ResponseEntity<Account> findAccount(@PathVariable Long id) {
+		Account result = accountService.find(id);
+		return ResponseEntity.of(Optional.of(result));
 	}
 
+	@ApiOperation(value = "Update an account", response = Account.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully updated account"),
+			@ApiResponse(code = 400, message = "Invalid input")
+	})
 	@PutMapping("/accounts/{id}")
-	public Account updateAccount(@PathVariable Long id, @RequestBody Account account) throws Exception {
+	public ResponseEntity<Account> updateAccount(@PathVariable Long id,
+												 @RequestBody Account account) throws Exception {
 		if (id.equals(account.getId())) {
-			return accountService.save(account);
+			return ResponseEntity.ok(accountService.save(account));
 		} else {
-			throw new Exception("Path error. mismatch Account id");
+			throw new ClientException("The id in the path does not much the id in the body.");
 		}
 	}
-	
+
+	@ApiOperation(value = "Delete an account")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully deleted account"),
+			@ApiResponse(code = 404, message = "Account not found")
+	})
 	@DeleteMapping("/accounts/{id}")
-	public void deleteAccount(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
 		accountService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
-	
+
+	@ApiOperation(value = "Deposit into an account", response = Account.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully deposited into account"),
+			@ApiResponse(code = 400, message = "Invalid input")
+	})
 	@PatchMapping("/accounts/{id}/deposit")
-	public Account deposit(@PathVariable Long id,
-							@RequestParam double amount) throws Exception {
-		
-		return accountService.deposit(id, amount);
+	public ResponseEntity<Account> deposit(@PathVariable Long id,
+										@RequestParam double amount) throws Exception {
+		return ResponseEntity.ok(accountService.deposit(id, amount));
 		
 	}
-	
+
+	@ApiOperation(value = "Withdraw from an account", response = Account.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully withdrawn into account"),
+			@ApiResponse(code = 400, message = "Invalid input")
+	})
 	@PatchMapping("/accounts/{id}/withdraw")
-	public Account withdraw(@PathVariable Long id,
-							@RequestParam double amount) throws Exception {
-		
-		return accountService.withdraw(id, amount);
+	public ResponseEntity<Account> withdraw(@PathVariable Long id,
+											@RequestParam double amount) throws Exception {
+		return ResponseEntity.ok(accountService.deposit(id, amount));
 	}
 }
