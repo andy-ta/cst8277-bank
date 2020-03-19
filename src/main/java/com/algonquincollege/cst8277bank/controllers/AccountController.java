@@ -1,16 +1,20 @@
 package com.algonquincollege.cst8277bank.controllers;
 
 import com.algonquincollege.cst8277bank.exceptions.ClientException;
+import com.algonquincollege.cst8277bank.exceptions.NotFoundException;
 import com.algonquincollege.cst8277bank.models.Account;
 import com.algonquincollege.cst8277bank.services.AccountService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,6 +26,15 @@ public class AccountController {
 	@Autowired
 	public AccountController(AccountService accountService) {
 		this.accountService = accountService;
+	}
+
+	@ApiOperation(value = "Find accounts", response = List.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success")
+	})
+	@GetMapping("/accounts")
+	public Page<Account> findAll(Pageable page) throws Exception {
+		return accountService.findAll(page);
 	}
 
 	@ApiOperation(value = "Create an account", response = Account.class)
@@ -37,7 +50,7 @@ public class AccountController {
 
 	@ApiOperation(value = "Find an account", response = Account.class)
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully created account"),
+			@ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 404, message = "Account not found")
 	})
 	@GetMapping("/accounts/{id}")
@@ -67,7 +80,7 @@ public class AccountController {
 			@ApiResponse(code = 404, message = "Account not found")
 	})
 	@DeleteMapping("/accounts/{id}")
-	public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteAccount(@PathVariable Long id) throws NotFoundException {
 		accountService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
