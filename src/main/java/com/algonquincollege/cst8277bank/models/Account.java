@@ -1,14 +1,18 @@
 package com.algonquincollege.cst8277bank.models;
 
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+@Entity
 public class Account {
 
+	@Id
+	@GeneratedValue
 	private Long id;
 	private String name;
 	private double balance;
 	private String type;
-	private List<String> users;
 	
 	public Long getId() {
 		return id;
@@ -40,13 +44,5 @@ public class Account {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public List<String> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<String> users) {
-		this.users = users;
 	}
 }
