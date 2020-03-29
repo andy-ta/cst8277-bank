@@ -9,3 +9,10 @@ spring:
   h2:
     console:
       enabled: true
+server:
+  port: 443
+  ssl:
+    key-store-password: abc123
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-alias: tomcat
