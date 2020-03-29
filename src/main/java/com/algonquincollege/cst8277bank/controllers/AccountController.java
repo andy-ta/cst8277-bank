@@ -92,7 +92,7 @@ public class AccountController {
 	})
 	@PatchMapping("/accounts/{id}/deposit")
 	public ResponseEntity<Account> deposit(@PathVariable Long id,
-										@RequestParam double amount) throws Exception {
+										   @RequestParam double amount) throws Exception {
 		return ResponseEntity.ok(accountService.deposit(id, amount));
 		
 	}
@@ -105,6 +105,6 @@ public class AccountController {
 	@PatchMapping("/accounts/{id}/withdraw")
 	public ResponseEntity<Account> withdraw(@PathVariable Long id,
 											@RequestParam double amount) throws Exception {
-		return ResponseEntity.ok(accountService.deposit(id, amount));
+		return ResponseEntity.ok(accountService.withdraw(id, amount));
 	}
 }

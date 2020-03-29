@@ -28,17 +28,19 @@ public class AccountService {
 
 	public Account save(Account account) throws Exception {
 		if (account.getId() == null) {
-			if (account.getBalance() > 0) {
+			if (account.getBalance() != null && account.getBalance() > 0) {
 				throw new ClientException("Cannot create account with balance greater than zero");
 			}
+			account.setBalance(0.0);
 			return accountRepository.save(account);
 		} else {
-			if (accountRepository.findById(account.getId())
-					.filter(a -> a.getBalance() != account.getBalance())
-					.isPresent()) {
-				return accountRepository.save(account);
+			Account inDatabase = accountRepository.findById(account.getId()).orElseThrow(accountNotFound());
+			if (account.getBalance() != null && !account.getBalance().equals(inDatabase.getBalance())) {
+					throw new ClientException("Cannot modify your own balance.");
 			} else {
-				throw new ClientException("Cannot modify your own balance.");
+				inDatabase.setName(account.getName());
+				inDatabase.setType(account.getType());
+				return accountRepository.save(inDatabase);
 			}
 		}
 	}
@@ -65,9 +67,8 @@ public class AccountService {
 		Account account = accountRepository.findById(id).orElseThrow(accountNotFound());
 		if (amount > 0) {
 			account.setBalance(account.getBalance() + amount);
-			
 		} else {
-			throw new ClientException("Amount must be greater then zero.");
+			throw new ClientException("Amount must be greater than zero.");
 		}
 
 		return accountRepository.save(account);
@@ -76,7 +77,7 @@ public class AccountService {
 	public Account withdraw(Long id, double amount) throws Exception {
 		Account account = accountRepository.findById(id).orElseThrow(accountNotFound());
 
-		if (amount > 0 && account.getBalance() > amount) {
+		if (amount > 0 && account.getBalance() >= amount) {
 			account.setBalance(account.getBalance() - amount);
 		} else {
 			throw new ClientException("Not enough money in account to withdraw.");

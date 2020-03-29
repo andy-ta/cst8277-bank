@@ -3,6 +3,7 @@ package com.algonquincollege.cst8277bank.models;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Account {
@@ -11,8 +12,24 @@ public class Account {
 	@GeneratedValue
 	private Long id;
 	private String name;
-	private double balance;
+	@NotNull
+	private Double balance;
 	private String type;
+
+	public Account() {
+	}
+
+	public Account(String name, String type) {
+		this.name = name;
+		this.type = type;
+	}
+
+	public Account(Account account) {
+		this.id = account.getId();
+		this.name = account.getName();
+		this.balance = account.getBalance();
+		this.type = account.getType();
+	}
 	
 	public Long getId() {
 		return id;
@@ -30,11 +47,11 @@ public class Account {
 		this.name = name;
 	}
 
-	public double getBalance() {
+	public Double getBalance() {
 		return balance;
 	}
 
-	public void setBalance(double balance) {
+	public void setBalance(Double balance) {
 		this.balance = balance;
 	}
 
