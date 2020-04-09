@@ -1,5 +1,9 @@
 package com.algonquincollege.cst8277bank.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,6 +16,9 @@ public class Account {
 	@GeneratedValue
 	private Long id;
 	private String name;
+	@Column(nullable = false, unique = true)
+	private String username;
+	private String password;
 	@NotNull
 	private Double balance;
 	private String type;
@@ -19,16 +26,11 @@ public class Account {
 	public Account() {
 	}
 
-	public Account(String name, String type) {
+	public Account(String name, String username, String password, String type) {
 		this.name = name;
+		this.username = username;
+		this.password = password;
 		this.type = type;
-	}
-
-	public Account(Account account) {
-		this.id = account.getId();
-		this.name = account.getName();
-		this.balance = account.getBalance();
-		this.type = account.getType();
 	}
 	
 	public Long getId() {
@@ -61,5 +63,23 @@ public class Account {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@JsonIgnore
+	public String getPassword() {
+		return password;
+	}
+
+	@JsonProperty
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }
