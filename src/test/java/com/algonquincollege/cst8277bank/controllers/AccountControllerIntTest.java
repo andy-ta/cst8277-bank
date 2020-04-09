@@ -6,20 +6,23 @@ import com.algonquincollege.cst8277bank.repositories.AccountRepository;
 import com.algonquincollege.cst8277bank.services.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,9 +44,14 @@ class AccountControllerIntTest {
 	@Autowired
 	private AccountRepository accountRepository;
 
+	@MockBean
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
 	private Account account;
 
 	private static final String NAME = "Andy Ta";
+	private static final String USERNAME = "andyta";
+	private static final String PASSWORD = "password";
 	private static final String TYPE = "Chequing";
 	private static final String UPDATED_NAME = "Andie Ta";
 	private static final String UPDATED_TYPE = "Savings";
@@ -51,7 +59,9 @@ class AccountControllerIntTest {
 	@BeforeEach
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		account = new Account(NAME, TYPE);
+		account = new Account(NAME, USERNAME, PASSWORD, TYPE);
+		Mockito.when(bCryptPasswordEncoder.encode(any())).thenReturn(PASSWORD);
+		Mockito.when(bCryptPasswordEncoder.matches(any(), any())).thenReturn(true);
 	}
 
 	@Test
@@ -75,7 +85,8 @@ class AccountControllerIntTest {
 	void findAccount() throws Exception {
 		Account saved = accountService.save(account);
 
-		mockMvc.perform(get("/api/v1/accounts/{id}", saved.getId()))
+		mockMvc.perform(get("/api/v1/accounts/{id}", saved.getId())
+				.headers(TestUtil.getAuthorizationBasic()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id").value(saved.getId()))
@@ -88,7 +99,8 @@ class AccountControllerIntTest {
 	void findAll() throws Exception {
 		Account saved = accountService.save(account);
 
-		mockMvc.perform(get("/api/v1/accounts?sort=id,desc"))
+		mockMvc.perform(get("/api/v1/accounts?sort=id,desc")
+				.headers(TestUtil.getAuthorizationBasic()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.content.[*].id").value(hasItem(saved.getId().intValue())))
@@ -113,6 +125,7 @@ class AccountControllerIntTest {
 		updated.setBalance(null); // Need wrapper Double to set to null
 
 		mockMvc.perform(put("/api/v1/accounts/{id}", initial.getId())
+				.headers(TestUtil.getAuthorizationBasic())
 				.contentType(TestUtil.APPLICATION_JSON_UTF8)
 				.content(TestUtil.convertObjectToJsonBytes(updated)))
 				.andExpect(status().isOk())
@@ -156,7 +169,8 @@ class AccountControllerIntTest {
 		double amt = 10.0;
 		double expectedBalance = initial.getBalance() + amt;
 
-		mockMvc.perform(patch("/api/v1/accounts/{id}/deposit?amount={amount}", initial.getId(), amt))
+		mockMvc.perform(patch("/api/v1/accounts/{id}/deposit?amount={amount}", initial.getId(), amt)
+				.headers(TestUtil.getAuthorizationBasic()))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(initial.getId()))
 				.andExpect(jsonPath("$.balance").value(expectedBalance))
@@ -180,7 +194,8 @@ class AccountControllerIntTest {
 		double amt = 10.0;
 		double expectedBalance = initial.getBalance() - amt;
 
-		mockMvc.perform(patch("/api/v1/accounts/{id}/withdraw?amount={amount}", initial.getId(), amt))
+		mockMvc.perform(patch("/api/v1/accounts/{id}/withdraw?amount={amount}", initial.getId(), amt)
+				.headers(TestUtil.getAuthorizationBasic()))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(initial.getId()))
 				.andExpect(jsonPath("$.balance").value(expectedBalance))

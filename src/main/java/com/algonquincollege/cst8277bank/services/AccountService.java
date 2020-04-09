@@ -7,6 +7,7 @@ import com.algonquincollege.cst8277bank.repositories.AccountRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.algonquincollege.cst8277bank.repositories.AccountRepository;
 
@@ -18,12 +19,15 @@ public class AccountService {
 
 	private AccountRepository accountRepository;
 	private AccountRepositoryCustom accountRepositoryCustom;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
 	public AccountService(AccountRepository accountRepository,
-						  AccountRepositoryCustom accountRepositoryCustom) {
+						  AccountRepositoryCustom accountRepositoryCustom,
+						  BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.accountRepository = accountRepository;
 		this.accountRepositoryCustom = accountRepositoryCustom;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	public Account save(Account account) throws Exception {
@@ -32,6 +36,7 @@ public class AccountService {
 				throw new ClientException("Cannot create account with balance greater than zero");
 			}
 			account.setBalance(0.0);
+			account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
 			return accountRepository.save(account);
 		} else {
 			Account inDatabase = accountRepository.findById(account.getId()).orElseThrow(accountNotFound());
