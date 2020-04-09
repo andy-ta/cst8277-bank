@@ -27,12 +27,18 @@ public class AccountDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(s);
         }
+
+        // Figure out the user's actual role
+/*        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ADMIN");
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        authorities.add(simpleGrantedAuthority);*/
+
         return new User(user.getUsername(),
                         user.getPassword(),
                 true,
                 true,
                 true,
                 true,
-                new HashSet<>());
+                new HashSet<>()); //authorities);
     }
 }

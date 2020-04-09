@@ -43,6 +43,7 @@ public class AccountController {
 			@ApiResponse(code = 201, message = "Successfully created account"),
 			@ApiResponse(code = 400, message = "Invalid input")
 	})
+	//@PreAuthorize("hasRole(\"ADMIN\")")
 	@PostMapping("/accounts")
 	public ResponseEntity<Account> saveAccount(@RequestBody Account account) throws Exception {
 		Account result = accountService.save(account);
