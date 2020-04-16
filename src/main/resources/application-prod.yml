@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/postgres
+    username: postgres
+    password: mysecretpassword
+  jpa:
+    hibernate:
+      ddl-auto: create
+server:
+  port: 8443
+  ssl:
+    key-store-password: abc123
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-alias: tomcat
