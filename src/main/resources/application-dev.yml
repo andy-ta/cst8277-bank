@@ -10,7 +10,7 @@ spring:
     console:
       enabled: true
 server:
-  port: 443
+  port: 8443
   ssl:
     key-store-password: abc123
     key-store: classpath:keystore.p12

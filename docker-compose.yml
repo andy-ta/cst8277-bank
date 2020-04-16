@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - 5432:5432
+
+  cst8277bank:
+    image: cst8277bank
+    restart: always
+    ports:
+      - 443:8443
+      - 80:8080
+    depends_on:
+      - db
